@@ -12,9 +12,9 @@ const Config: React.FC<ConfigProps> = () => {
 
   return (
     <div className="w-full h-full flex">
-      <div className="w-265px border-r border-gray-300">
+      <div className="w-265px border-r border-gray-300 flex-shrink-0">
         <div className="h-60px flex items-center border-b border-gray-300">
-          <div className="w-40px flex justify-center">
+          <div className="w-40px flex justify-center flex-shrink-0">
             <MenuIcon></MenuIcon>
           </div>
           <SearchIcon className="text-gray-500 fill-current mr-1"></SearchIcon>
