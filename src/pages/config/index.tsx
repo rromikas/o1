@@ -1,14 +1,23 @@
 import MenuIcon from "@material-ui/icons/Menu";
 import SearchIcon from "@material-ui/icons/Search";
 import PersonIcon from "@material-ui/icons/PersonOutline";
+import AccountsIcon from "@material-ui/icons/PeopleOutline";
 import { useState } from "react";
 import UserProfiles from "./userProfiles";
+import Accounts from "./accounts";
+import ButtonBase from "@material-ui/core/ButtonBase";
 
 export interface ConfigProps {}
 
 const Config: React.FC<ConfigProps> = () => {
-  const menuItems = [{ icon: PersonIcon, title: "User Profiles" }];
+  const menuItems = [
+    { icon: AccountsIcon, title: "Accounts", page: Accounts },
+    { icon: PersonIcon, title: "User Profiles", page: UserProfiles },
+  ];
   const [activePageIndex, setActivePageIndex] = useState(0);
+
+  const Page = menuItems[activePageIndex].page;
+  const Title = menuItems[activePageIndex].title;
 
   return (
     <div className="w-full h-full flex">
@@ -26,23 +35,21 @@ const Config: React.FC<ConfigProps> = () => {
           ></input>
         </div>
         {menuItems.map((x, i) => (
-          <div
+          <ButtonBase
+            onClick={() => setActivePageIndex(i)}
             key={`config-menu-item-${i}`}
-            className={`flex h-34px items-center ${activePageIndex === i ? "bg-gray-200" : ""}`}
+            className={`cursor-pointer outline-none w-full justify-start flex h-34px hover:bg-gray-200 items-center ${
+              activePageIndex === i ? "bg-gray-200" : ""
+            }`}
           >
             <div className="w-40px flex justify-center">
               <x.icon></x.icon>
             </div>
             <div className="leading-34px">{x.title}</div>
-          </div>
+          </ButtonBase>
         ))}
       </div>
-      <div className="flex-grow flex flex-col">
-        <div className="h-60px font-bold p-3 flex items-center text-xl border-b border-gray-300">
-          User Profiles
-        </div>
-        <UserProfiles></UserProfiles>
-      </div>
+      <Page></Page>
     </div>
   );
 };

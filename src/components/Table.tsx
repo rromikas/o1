@@ -2,36 +2,50 @@ import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import { useState, useEffect } from "react";
 import Checkbox from "@material-ui/core/Checkbox";
-import Pagination from "@material-ui/lab/Pagination";
 import ReactDOM from "react-dom";
 import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
-
-type column = {
-  headerName: string;
-  id: string;
-  valueGetter?: Function;
-  minWidth?: number;
-};
+import EditIcon from "@material-ui/icons/Edit";
+import TablePagination from "@material-ui/core/TablePagination";
 
 export interface TableProps<ObjectType> {
-  columns: Array<column>;
+  columns: Array<{
+    headerName: string;
+    id: string;
+    valueGetter?: Function;
+    minWidth?: number;
+  }>;
+  onCreate?: Function;
+  onEdit?: Function;
   rows: Array<ObjectType>;
-  pageSize?: number;
+  defaultPageSize?: number;
+  renderToolbarOutside?: boolean;
+  deletableRow?: boolean;
+  editableRow?: boolean;
   setRows: Function;
+  addIsAdd?: boolean;
+  paginationPosition?: "bottom" | "top";
 }
 
 const Table = <T extends { [index: string]: string | number | boolean }>({
   columns,
   rows,
-  pageSize = 10,
+  defaultPageSize = 10,
+  renderToolbarOutside = false,
+  editableRow = true,
+  deletableRow = true,
   setRows,
+  addIsAdd = true,
+  paginationPosition = "bottom",
+  onCreate = () => {},
+  onEdit = () => {},
 }: TableProps<T>) => {
   const [search, setSearch] = useState({} as { [index: string]: string });
   const [sort, setSort] = useState(null as null | { by: string; asc: boolean });
   const [identifiedRows, setIdentifiedRows] = useState([] as Array<T>);
   const [page, setPage] = useState(0);
   const [selectedRows, setSelectedRows] = useState([] as Array<number>);
+  const [pageSize, setPageSize] = useState(10);
 
   let filtered = [...identifiedRows];
 
@@ -56,53 +70,88 @@ const Table = <T extends { [index: string]: string | number | boolean }>({
   }
 
   useEffect(() => {
-    setIdentifiedRows(rows.map((x, i) => ({ ...x, id: Math.random() })));
+    setPageSize(defaultPageSize);
+  }, [defaultPageSize]);
+
+  useEffect(() => {
+    setIdentifiedRows(rows.map((x, i) => ({ ...x, id: i })));
   }, [rows]);
 
   useEffect(() => {
-    const handleDelete = () => {
-      let newRows = JSON.parse(JSON.stringify(identifiedRows));
-      selectedRows.forEach((x) => {
-        let index = newRows.findIndex((r: T) => r.id === x);
-        newRows.splice(index, 1);
-      });
+    if (renderToolbarOutside) {
+      const handleDelete = () => {
+        let newRows = JSON.parse(JSON.stringify(identifiedRows));
+        selectedRows.forEach((x) => {
+          let index = newRows.findIndex((r: T) => r.id === x);
+          newRows.splice(index, 1);
+        });
 
-      setRows(newRows);
-      setSelectedRows([]);
-    };
+        setRows(newRows);
+        setSelectedRows([]);
+      };
 
-    const Toolbar = () => {
-      return (
-        <div className="flex items-center">
-          {selectedRows.length ? (
-            <div onClick={handleDelete} className="items-center flex mr-3 cursor-pointer">
-              <DeleteIcon className="mr-1"></DeleteIcon> Delete
+      const Toolbar = () => {
+        return (
+          <div className="flex items-center">
+            {selectedRows.length ? (
+              <div onClick={handleDelete} className="items-center flex mr-3 cursor-pointer">
+                <DeleteIcon className="mr-1"></DeleteIcon> Delete
+              </div>
+            ) : null}
+            <div className="items-center flex cursor-pointer" onClick={() => onCreate()}>
+              <AddIcon className="mr-1"></AddIcon> {addIsAdd ? "Add" : "Create"}
             </div>
-          ) : null}
-          <div className="items-center flex cursor-pointer">
-            <AddIcon className="mr-1"></AddIcon> Add
           </div>
-        </div>
-      );
-    };
-    ReactDOM.render(<Toolbar></Toolbar>, document.getElementById("table-toolbar"));
+        );
+      };
+      ReactDOM.render(<Toolbar></Toolbar>, document.getElementById("table-toolbar"));
 
-    return () => {
-      const node = document.getElementById("table-toolbar");
-      if (node) {
-        ReactDOM.unmountComponentAtNode(node);
-      }
-    };
+      return () => {
+        const node = document.getElementById("table-toolbar");
+        if (node) {
+          ReactDOM.unmountComponentAtNode(node);
+        }
+      };
+    }
   }, [selectedRows, identifiedRows, setRows]);
 
+  const handleDelete = (id: number) => {
+    let newRows = JSON.parse(JSON.stringify(identifiedRows));
+    const deleteIndex = newRows.findIndex((x: any) => x.id === id);
+    newRows.splice(deleteIndex, 1);
+    setRows(newRows);
+  };
+
   return (
-    <div>
+    <div className="w-full">
       <style>
         {`td{
           padding: 10px 10px;
-        }`}
+        }
+
+         .row-toolbox{
+           visibility: hidden;
+         }
+
+         .table-row:hover .row-toolbox{
+          visibility: visible;
+         }
+
+        `}
       </style>
-      <table className="w-full mb-3">
+      {paginationPosition === "top" ? (
+        <div className="h-60px p-3 flex items-center justify-end  border-b border-gray-300">
+          <TablePagination
+            component="div"
+            count={filtered.length}
+            page={page}
+            onChangePage={(ev: any, page: number) => setPage(page)}
+            rowsPerPage={pageSize}
+            onChangeRowsPerPage={(ev: any) => setPageSize(ev.target.value)}
+          />
+        </div>
+      ) : null}
+      <table className="w-full">
         <tr className="border-b border-gray-300">
           <td>
             <Checkbox
@@ -124,7 +173,7 @@ const Table = <T extends { [index: string]: string | number | boolean }>({
               style={{ minWidth: c.minWidth ? c.minWidth : 0 }}
             >
               <div className="flex text-gray-600">
-                <div className="mr-2 font-medium text-lg">{c.headerName}</div>
+                <div className="mr-2 font-medium text-lg whitespace-nowrap">{c.headerName}</div>
                 <div
                   className="cursor-pointer"
                   onClick={() => {
@@ -160,9 +209,10 @@ const Table = <T extends { [index: string]: string | number | boolean }>({
               ></input>
             </td>
           ))}
+          <td className="w-20"></td>
         </tr>
         {filtered.slice(page * pageSize, page * pageSize + pageSize).map((r, ri) => (
-          <tr className="h-60px border-b border-gray-300">
+          <tr className="h-60px border-b border-gray-300 hover:bg-gray-200 table-row">
             <td>
               <Checkbox
                 color="primary"
@@ -186,13 +236,41 @@ const Table = <T extends { [index: string]: string | number | boolean }>({
                 {c.valueGetter ? c.valueGetter(r[c.id]) : r[c.id]}
               </td>
             ))}
+            <td className="w-20">
+              <div className="row-toolbox flex items-center justify-center">
+                {editableRow ? (
+                  <div
+                    onClick={() => onEdit(r.id as number)}
+                    className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-300 mr-3 cursor-pointer"
+                  >
+                    <EditIcon className="text-gray-600"></EditIcon>
+                  </div>
+                ) : null}
+                {deletableRow ? (
+                  <div
+                    onClick={() => handleDelete(r.id as number)}
+                    className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-300 cursor-pointer"
+                  >
+                    <DeleteIcon className="text-gray-600"></DeleteIcon>
+                  </div>
+                ) : null}
+              </div>
+            </td>
           </tr>
         ))}
       </table>
-      <Pagination
-        onChange={(e: any, page: number) => setPage(page - 1)}
-        count={Math.ceil(filtered.length / pageSize)}
-      ></Pagination>
+      {paginationPosition === "bottom" ? (
+        <div className="h-60px p-3 flex items-center justify-end">
+          <TablePagination
+            component="div"
+            count={filtered.length}
+            page={page}
+            onChangePage={(ev: any, page: number) => setPage(page)}
+            rowsPerPage={pageSize}
+            onChangeRowsPerPage={(ev: any) => setPageSize(ev.target.value)}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

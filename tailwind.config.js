@@ -2,6 +2,7 @@ const sizes = {
   "2px": "2px",
   "22px": "22px",
   "34px": "34px",
+  "35px": "35px",
   "40px": "40px",
   "42px": "42px",
   "48px": "48px",
@@ -9,7 +10,9 @@ const sizes = {
   "80px": "80px",
   "265px": "265px",
   "420px": "420px",
+  "500px": "500px",
   "748px": "748px",
+  "1200px": "1200px",
 };
 
 module.exports = {
@@ -22,6 +25,11 @@ module.exports = {
       lineHeight: sizes,
       maxWidth: sizes,
       minWidth: sizes,
+      colors: {
+        blue: {
+          400: "#0294F2",
+        },
+      },
     },
   },
   variants: {

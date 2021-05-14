@@ -222,55 +222,73 @@ export const settings = [
     label: "Enterprise",
     visualizationLevel: "Structure Unit",
     id: 0,
+    lowestRoleId: 2,
     items: [
       {
         label: "LE",
         visualizationLevel: "Structure Unit",
         id: 0,
-        items: [{ label: "LE OBM", visualizationLevel: "Structure Unit", id: 0, items: [] }],
+        lowestRoleId: 2,
+        items: [
+          {
+            label: "LE OBM",
+            visualizationLevel: "Structure Unit",
+            id: 0,
+            lowestRoleId: 2,
+            items: [],
+          },
+        ],
       },
       {
         label: "BPM LE",
         visualizationLevel: "Structure Unit",
         id: 1,
+        lowestRoleId: 2,
         items: [
           {
             label: "BPM LOB",
             visualizationLevel: "Structure Unit",
             id: 0,
+            lowestRoleId: 2,
             items: [
               {
                 label: "Org A",
                 visualizationLevel: "Organization",
                 id: 0,
+                lowestRoleId: 2,
                 items: [
                   {
                     label: "Amazon Aurora PostgreeSQL (app)",
                     visualizationLevel: "Line of Business",
                     id: 0,
+                    lowestRoleId: 2,
                     items: [],
                   },
                   {
                     label: "AWS Athena (app)",
                     visualizationLevel: "Line of Business",
                     id: 1,
+                    lowestRoleId: 2,
                     items: [
                       {
                         label: "test_aurora_postgres_db(sys)",
                         visualizationLevel: "Line of Business",
                         id: 0,
+                        lowestRoleId: 2,
                         items: [],
                       },
                       {
                         label: "table1_lengthtynamecheck_12332241324242342trfuy",
                         visualizationLevel: "Line of Business",
                         id: 1,
+                        lowestRoleId: 2,
                         items: [],
                       },
                       {
                         label: "check_aws",
                         visualizationLevel: "Line of Business",
                         id: 2,
+                        lowestRoleId: 2,
                         items: [],
                       },
                     ],
@@ -285,6 +303,7 @@ export const settings = [
         label: "New LE 01",
         visualizationLevel: "Structure Unit",
         id: 2,
+        lowestRoleId: 2,
         items: [],
       },
     ],

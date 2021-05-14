@@ -33,7 +33,13 @@ const Users: React.FC<UsersProps> = ({ users, setUsers }) => {
   ];
   return (
     <div>
-      <Table columns={columns} rows={users} setRows={setUsers}></Table>
+      <Table
+        columns={columns}
+        rows={users}
+        setRows={setUsers}
+        renderToolbarOutside
+        editableRow={false}
+      ></Table>
     </div>
   );
 };

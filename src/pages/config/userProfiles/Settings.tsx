@@ -90,7 +90,6 @@ export interface SettingsProps {
 }
 
 const Settings: React.FC<SettingsProps> = ({ settings, setVisualizationLevel }) => {
-  const [sort, setSort] = useState({ key: "", order: "none" } as { key: string; order: string });
   const [search, setSearch] = useState({ organization: "", visualizationLevel: "" } as {
     [index: string]: string;
   });
